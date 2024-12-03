@@ -1,0 +1,5 @@
+database_files:
+  db_file_1: /run/media/zimc/Toshiba/ros_bags/20241202_142055/camera_20241202_142055_bag/camera_20241202_142055_bag_0.db3
+
+topics:
+  image_rect_color: /zed/zed_node/rgb/image_rect_color
