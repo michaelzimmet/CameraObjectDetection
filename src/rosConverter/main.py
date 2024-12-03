@@ -1,19 +1,21 @@
-from pathlib import Path
-
+import os
+import sys
 import yaml
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import Config
 
-from CV2Utilities import cvt_message_to_cv2, show_image
+from pathlib import Path
 from DatabaseUtilities import SQLiteConnection, load_sql_template
+from CV2Utilities import show_image, cvt_message_to_cv2
 
 
 def main():
-    config_file = Path('parameters.yml')
-    config = read_config_file(config_file)
+    config = read_config_file(Config.PARAMETERS_YML)
 
     con = SQLiteConnection(config['database_files']['db_file_1'])
 
     params = {'topic_name': config['topics']['image_rect_color']}
-    sql_query = load_sql_template(Path('sql/select_rows_by_topicname.sql'), params)
+    sql_query = load_sql_template(Config.SQL_SELECT_ROWS_BY_TOPICNAME, params)
     print(sql_query)
     messages = con.execute_select(sql_query, fetch_num=1, params=params)
     show_image(cvt_message_to_cv2(messages))
