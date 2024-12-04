@@ -4,6 +4,7 @@ ROOT_DIR = Path(__file__).parent.parent
 SRC_DIR = ROOT_DIR / 'src'
 RES_DIR = ROOT_DIR / 'res'
 SQL_DIR = RES_DIR / 'sql'
+IMAGE_DIR = RES_DIR / 'images'
 
 # Configs for rosConverter
 ROS_CONVERTER_DIR = SRC_DIR / 'rosConverter'

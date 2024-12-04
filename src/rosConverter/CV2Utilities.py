@@ -1,7 +1,11 @@
+from pathlib import Path
+
 import cv2
 import rclpy.serialization
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
+
+import Config
 
 bridge = CvBridge()
 
@@ -9,7 +13,6 @@ bridge = CvBridge()
 def cvt_message_to_cv2(message):
     data = message['data']
     return message, deserialize_image(data)
-
 
 
 def show_image(image):
@@ -39,3 +42,8 @@ def play_image_sequence(images, delay=.03):
         if cv2.waitKey(int(delay * 1000)) & 0xFF == ord('q'):
             break
     cv2.destroyAllWindows()
+
+def store_image(image, file: Path) -> None:
+    path = Config.IMAGE_DIR / file
+    path.parent.mkdir(parents=True, exist_ok=True)
+    cv2.imwrite(str(path), image)
