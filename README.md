@@ -1,0 +1,3 @@
+- Laufende SAM-Umgebung
+- Daten auf dem KI-Server
+- 
