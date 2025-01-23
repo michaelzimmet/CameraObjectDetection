@@ -1,7 +1,9 @@
 TODO: 
-- Auto-Labeling testen mit:
-  - Fine-Tuned-YOLO
-  - Mit Roboflow Modell
 - Mehr Trainingsdaten erstellen
-- Ergebnisse filtern
-- Tracking-Möglichkeiten
+- Pipeline:
+  - Eingabe von Model Weights + Bilder für eine Ausgabe
+  - Videos erstellen
+  - Videos Tracken lassen
+  - Videos abspeichern / abspielen
+  - Fine-Tuning aufräumen
+- Tracking Improvements
