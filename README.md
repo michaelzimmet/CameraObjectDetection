@@ -7,3 +7,10 @@ TODO:
   - Videos abspeichern / abspielen
   - Fine-Tuning aufräumen
 - Tracking Improvements
+- Fertiges Softwarepaket:
+  - Installationsskript für die Pakete
+  - Import der Pakete
+  - Laden des Modells vom Fine-Tuned File
+  - Predict-Image Funktion
+  - Track-Video Funktion
+- Dokumentation
