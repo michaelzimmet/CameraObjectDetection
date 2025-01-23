@@ -14,3 +14,10 @@ TODO:
   - Predict-Image Funktion
   - Track-Video Funktion
 - Dokumentation
+   - Erstellung des Datensatzes
+   - Fine-Tuning von YOLO
+   - Installation von YOLO
+   - Upload des Modells für automatische Datensatzerstellung
+   - Tracking
+   - Schnittstellenbeschreibung
+   - Probleme, Abgrenzung
