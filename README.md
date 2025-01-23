@@ -1,7 +1,5 @@
 TODO: 
-- Laufende SAM-Umgebung
-- Daten auf dem KI-Server
-- Mit klassischer CV die Pylonen erkennen
-- Segmentierung mit SAM in Code
-- Research Tracking mit SAM
-- 
+- YOLO-Fine-Tuning Skript erstellen
+- Auto-Labeling testen mit:
+  - Fine-Tuned-YOLO
+  - Mit Roboflow Modell
