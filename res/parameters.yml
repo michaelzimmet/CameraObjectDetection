@@ -11,3 +11,8 @@ database_files:
 
 topics:
   image_rect_color: /zed/zed_node/rgb/image_rect_color
+  depth_registered: /zed/zed_node/depth/depth_registered
+  confidence_map: /zed/zed_node/confidence/confidence_map
+  disparity_image: /zed/zed_node/disparity/disparity_image
+  left_image_rect_color: /zed/zed_node/left/image_rect_color
+  right_image_rect_color: /zed/zed_node/right/image_rect_color
