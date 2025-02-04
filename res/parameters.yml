@@ -16,3 +16,5 @@ topics:
   disparity_image: /zed/zed_node/disparity/disparity_image
   left_image_rect_color: /zed/zed_node/left/image_rect_color
   right_image_rect_color: /zed/zed_node/right/image_rect_color
+  pose: /zed/zed_node/pose
+  left_camera_info: /zed/zed_node/left/camera_info

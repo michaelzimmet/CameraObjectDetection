@@ -1,13 +1,16 @@
+import os
 from collections import defaultdict
 from pathlib import Path
-from pprint import pprint
 
 import cv2
-import os
+import numpy as np
 import rclpy.serialization
+from cv_bridge import CvBridge
+from geometry_msgs.msg import PoseStamped
+from rclpy.serialization import deserialize_message
+from sensor_msgs.msg import CameraInfo
 from sensor_msgs.msg import Image
 from stereo_msgs.msg import DisparityImage
-from cv_bridge import CvBridge
 
 import Config
 
@@ -28,6 +31,23 @@ def show_image(image):
 def deserialize_image(message_data):
     img_msg = rclpy.serialization.deserialize_message(message_data, Image)
     return {'image': bridge.imgmsg_to_cv2(img_msg, desired_encoding='passthrough')}
+
+
+def deserialize_pose(message_data):
+    msg = deserialize_message(message_data, PoseStamped)
+    pos = msg.pose.position
+    ori = msg.pose.orientation
+
+    return {'position': pos, 'orientation': ori, 'message': msg}
+
+def deserialize_camera_info(message_data):
+    msg = deserialize_message(message_data, CameraInfo)
+    intrinsic_camera_matrix = np.array(msg.k).reshape((3, 3))
+    distortion_coefficient = np.array(msg.d)
+    rotation_matrix = np.array(msg.r).reshape((3, 3))
+    projection_matrix = np.array(msg.p).reshape((3, 4))
+
+    return {'K': intrinsic_camera_matrix, 'D': distortion_coefficient, 'R': rotation_matrix, 'P': projection_matrix}
 
 def deserialize_disparity_image(message_data):
     disparity_msg = rclpy.serialization.deserialize_message(message_data, DisparityImage)

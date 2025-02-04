@@ -12,9 +12,9 @@ class Kalman3D:
         """Erstellt einen 3D-Kalman-Filter für (x, y, z) Tracking."""
         self.kf = KalmanFilter(dim_x=6, dim_z=3)
 
-        self.kf.F = np.array([[1, 0, 0, 1, 0,  0],
-                              [0, 1, 0, 0,  1, 0],
-                              [0, 0, 1, 0,  0,  1],
+        self.kf.F = np.array([[1, 0, 0, .07, 0,  0],
+                              [0, 1, 0, 0,  .07, 0],
+                              [0, 0, 1, 0,  0,  .07],
                               [0, 0, 0, 1,  0,  0],
                               [0, 0, 0, 0,  1,  0],
                               [0, 0, 0, 0,  0,  1]])
@@ -93,7 +93,7 @@ for idx, image in enumerate(images):
                     pred_pos = tracker.predict()
                     dist = np.linalg.norm(pred_pos - pos)
 
-                    if dist < 5:
+                    if dist < 20:
                         assigned_id = track_id
                         min_dist = dist
 

@@ -3,7 +3,7 @@ from jinja2 import Template
 from pathlib import Path
 
 import Config
-from rosConverter.CV2Utilities import deserialize_image, query_data
+from rosConverter.CV2Utilities import query_data
 
 
 class SQLiteConnection:

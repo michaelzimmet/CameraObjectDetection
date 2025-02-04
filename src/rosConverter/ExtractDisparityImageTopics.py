@@ -1,5 +1,6 @@
 import os
 import sys
+
 from tqdm import tqdm
 
 from rosConverter.BaseUtils import read_config_file
@@ -8,7 +9,6 @@ from rosConverter.CV2Utilities import deserialize_disparity_image
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import Config
 
-from pathlib import Path
 from DatabaseUtilities import query_topic_data
 from CV2Utilities import (play_image_sequence,
                           store_image)
@@ -26,7 +26,7 @@ def main():
 
     play_image_sequence(data['image'])
 
-    data_path = Path(f'{db_file_param}/{topic_name}')
+    data_path = Config.IMAGE_DIR / f'{db_file_param}/{topic_name}'
     for i, img in tqdm(enumerate(data['image'], start=1), desc='Processing'):
         store_image(img, data_path / f'img_{i}.png')
 
