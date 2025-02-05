@@ -30,21 +30,21 @@ def get_poses(position_path, orientation_path):
             entry = [qx, qy, qz, qw]
             orientations.append(entry)
 
-    return [a + b for a, b in zip(positions, orientations)]
+    return [a + b for a,b in zip(positions, orientations)]
 
 model = YOLO("../res/last.pt")
 kf3d_tracker = {}
 
-image_folder = "../res/images/db_file_6/left_image_rect_color/"
-depth_folder = "../res/images/db_file_6/depth_registered/"
+image_folder = "../res/images/db_file_8/left_image_rect_color/"
+depth_folder = "../res/images/db_file_8/depth_registered/"
 
-images = sorted(glob.glob(os.path.join(image_folder, "*.tiff")), key=extract_number)
+images = sorted(glob.glob(os.path.join(image_folder, "*.png")), key=extract_number)
 depth_maps = sorted(glob.glob(os.path.join(depth_folder, "*.tiff")), key=extract_number)
-poses = get_poses(Config.IMAGE_DIR / 'db_file_6' / 'pose' / 'pose_position.txt', Config.IMAGE_DIR / 'db_file_6' / 'pose' / 'pose_orientation.txt')
+poses = get_poses(Config.IMAGE_DIR / 'db_file_8' / 'pose' / 'pose_position.txt', Config.IMAGE_DIR / 'db_file_8' / 'pose' / 'pose_orientation.txt')
 
-K = np.array([[480.3142395, 0., 328.18130493],
-              [0., 480.3142395, 181.9155426],
-              [0., 0., 1.]], dtype=float)
+K = np.array([[480.3142395,          0., 328.18130493],
+                    [         0., 480.3142395,  181.9155426],
+                    [         0.,          0.,          1.]], dtype=float)
 
 for idx, image_path in enumerate(images):
     frame = cv2.imread(image_path)
@@ -56,32 +56,36 @@ for idx, image_path in enumerate(images):
     detections = results[0].boxes.data.cpu().numpy()
 
     for det in detections:
-        x1, y1, x2, y2, conf, cls = det
-        if conf > 0.8:
-            bbox = (x1, y1, x2, y2)
-            pos_world = get_3d_position(bbox, depth_map, K, px, py, pz, qx, qy, qz, qw)
-            if pos_world is not None:
+        x_top_left, y_top_left, x_bottom_right, y_bottom_right, confidence, class_num = det
+
+        if confidence > 0.8:
+            bounding_box = (x_top_left, y_top_left, x_bottom_right, y_bottom_right)
+            normalized_pylon_position = get_3d_position(bounding_box, depth_map, K, px, py, pz, qx, qy, qz, qw)
+
+            if normalized_pylon_position is not None:
+
                 assigned_id = None
                 min_dist = float("inf")
+
                 # Finde einen passenden Track anhand der euklidischen Distanz
                 for track_id, tracker in kf3d_tracker.items():
                     pred_pos = tracker.predict()
-                    dist = np.linalg.norm(pred_pos - pos_world)
-                    if dist < 1.0 and dist < min_dist:  # Schwellwert (20) ggf. anpassen
+                    dist = np.linalg.norm(pred_pos - normalized_pylon_position)
+                    if dist < 1.2 and dist < min_dist:  # Schwellwert (20) ggf. anpassen
                         min_dist = dist
                         assigned_id = track_id
                 # Starte einen neuen Track, falls keiner passt
                 if assigned_id is None:
                     assigned_id = len(kf3d_tracker)
                     kf3d_tracker[assigned_id] = Kalman3D()
-                    kf3d_tracker[assigned_id].initialize(*pos_world)
+                    kf3d_tracker[assigned_id].initialize(*normalized_pylon_position)
                 else:
-                    kf3d_tracker[assigned_id].update(pos_world)
+                    kf3d_tracker[assigned_id].update(normalized_pylon_position)
 
                 # Optional: Visualisierung der Detektion (zeige Bounding Box und ID im Bild)
-                cv2.putText(frame, f"ID {assigned_id} Z:{pos_world[2]:.2f}m", (int(x1), int(y1) - 10),
+                cv2.putText(frame, f"ID {assigned_id} Z:{normalized_pylon_position[2]:.2f}m", (int(x_top_left), int(y_top_left) - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-                cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+                cv2.rectangle(frame, (int(x_top_left), int(y_top_left)), (int(x_bottom_right), int(y_bottom_right)), (0, 255, 0), 2)
 
     cv2.imshow("Kalman3D Tracking (Weltkoordinaten)", frame)
     if cv2.waitKey(30) & 0xFF == 27:

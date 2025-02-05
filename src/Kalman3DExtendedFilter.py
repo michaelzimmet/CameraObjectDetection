@@ -8,7 +8,7 @@ class Kalman3D:
         self.kf = KalmanFilter(dim_x=6, dim_z=3)
 
         # Time between two frames
-        delta_time = 0.7
+        delta_time = 0.07
         self.delta_time = delta_time
 
         # State Matrix containing the current position and velocity for x, y, z
@@ -32,7 +32,7 @@ class Kalman3D:
         self.kf.Q = np.eye(6) * 0.01
 
         # Start noise ->
-        #self.kf.P *= .1
+        self.kf.P *= 10
 
     def initialize(self, x, y, z):
         """
