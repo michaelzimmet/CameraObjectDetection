@@ -3,23 +3,34 @@ import numpy as np
 from ultralytics import YOLO
 from collections import defaultdict
 
-# Kalman-Filter funktioniert stabil, wenn die Objekte sich linear bewegen, sobald es jedoch zu Kameradrehungen kommt,
-# kann es zu Fehlern kommen, da der Filter nur die Geschwindigkeit der Objekte speichert und keine Richtungsinformationen hat.
-
-# Kalman-Filter Klasse
 class KalmanFilter:
     def __init__(self):
         self.tracks = defaultdict(lambda: {"position": None, "velocity": None})
+        self.delta_time = .7
 
     def update(self, object_id, new_position):
+        """
+        Refresh the Position of the object based on the old and new position
+        velocity is the calculated by the kinematic equation -> velocity= (new_position - current_position) / delta_time
+        :param object_id:
+        :param new_position: new position of the object if its moving. Contains x and y coordinates
+        :return: None
+        """
         if object_id in self.tracks:
-            last_pos = self.tracks[object_id]["position"]
-            if last_pos is not None:
-                velocity = np.array(new_position) - np.array(last_pos)
+            current_position = self.tracks[object_id]["position"]
+            if current_position is not None:
+                velocity = (np.array(new_position) - np.array(current_position)) / self.delta_time
                 self.tracks[object_id]["velocity"] = velocity
         self.tracks[object_id]["position"] = new_position
 
+
     def predict(self, object_id):
+        """
+        Predict the next position of the object based on the current position and velocity.
+        In case velocity is None, the current position will be returned
+        :param object_id: unique id for a tracked Object
+        :return: predicted position of the object
+        """
         if self.tracks[object_id]["velocity"] is not None:
             return np.array(self.tracks[object_id]["position"]) + self.tracks[object_id]["velocity"]
         return self.tracks[object_id]["position"]
@@ -43,25 +54,31 @@ while cap.isOpened():
     detections = results[0].boxes.data.cpu().numpy()
 
     for det in detections:
-        x1, y1, x2, y2, conf, cls = det
-        if conf > 0.6:  # Nur sichere Erkennungen tracken
-            center_x, center_y = (x1 + x2) / 2, (y1 + y2) / 2
+        x_top_left, y_top_left, x_bottom_right, y_bottom_right, confidence, class_num = det
 
-            # Falls ein Track existiert, verwende Kalman-Vorhersage
+        # Only process tracking if confidence is above a certain factor
+        if confidence > 0.6:
+            center_x, center_y = (x_top_left + x_bottom_right) / 2, (y_top_left + y_bottom_right) / 2
+
             assigned_id = None
             min_dist = float("inf")
 
-            for t_id, track in tracks.items():
-                pred_x, pred_y = kf.predict(t_id)
+            for track_id, track in tracks.items():
+                pred_x, pred_y = kf.predict(track_id)
+
+                # euclidean distance -> sqrt((center_x-pred_x)^2 + (center_y-pred_y)^2)
                 dist = np.linalg.norm([center_x - pred_x, center_y - pred_y])
 
-                if dist < 70:  # Falls Track nahe genug ist, übernehme ID
-                    assigned_id = t_id
+                # distance threshold in pixel
+                if dist < 70 and dist < min_dist:
+                    assigned_id = track_id
                     min_dist = dist
 
-            if assigned_id is None:  # Falls kein Track passt, neuen Track starten
+            # Start a new track if no track is assigned
+            if assigned_id is None:
                 assigned_id = track_id
                 track_id += 1
+
 
             tracks[assigned_id] = (center_x, center_y)
             kf.update(assigned_id, (center_x, center_y))
