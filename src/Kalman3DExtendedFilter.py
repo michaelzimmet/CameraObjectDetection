@@ -3,10 +3,10 @@ from filterpy.kalman import KalmanFilter
 
 
 class Kalman3D:
-    def __init__(self):
+    def __init__(self, pred_class):
         # dim_x = (x, y, z, vx, vy, vz), dim_z = (x, y, z)
         self.kf = KalmanFilter(dim_x=6, dim_z=3)
-
+        self.pred_class = pred_class
         # Time between two frames
         delta_time = 0.07
         self.delta_time = delta_time
@@ -28,10 +28,10 @@ class Kalman3D:
         # Sensor noise -> if value < 1, the sensor is trusted more
         self.kf.R *= 0.1
 
-        # Process noise ->
+        # Process noise -> the smaller the value, the more the model assumes that the objects are static
         self.kf.Q = np.eye(6) * 0.01
 
-        # Start noise ->
+        # Start noise
         self.kf.P *= 10
 
     def initialize(self, x, y, z):

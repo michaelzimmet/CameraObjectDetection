@@ -80,7 +80,6 @@ while cap.isOpened():
             tracks[assigned_id] = (center_x, center_y)
             kf.update(assigned_id, (center_x, center_y))
 
-            # Zeichne Tracking-IDs
             cv2.putText(frame, f"ID {assigned_id}", (int(center_x), int(center_y) - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
             cv2.circle(frame, (int(center_x), int(center_y)), 5, (0, 255, 0), -1)
