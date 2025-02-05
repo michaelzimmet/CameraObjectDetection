@@ -6,7 +6,7 @@ from collections import defaultdict
 class KalmanFilter:
     def __init__(self):
         self.tracks = defaultdict(lambda: {"position": None, "velocity": None})
-        self.delta_time = .7
+        self.delta_time = 1
 
     def update(self, object_id, new_position):
         """
@@ -32,7 +32,7 @@ class KalmanFilter:
         :return: predicted position of the object
         """
         if self.tracks[object_id]["velocity"] is not None:
-            return np.array(self.tracks[object_id]["position"]) + self.tracks[object_id]["velocity"]
+            return np.array(self.tracks[object_id]["position"]) + (self.tracks[object_id]["velocity"] * self.delta_time)
         return self.tracks[object_id]["position"]
 
 
@@ -41,7 +41,6 @@ model = YOLO("../res/last.pt")
 kf = KalmanFilter()
 cap = cv2.VideoCapture("../res/videos/db_file_6.mp4")
 
-track_id = 0
 tracks = {}
 
 while cap.isOpened():
@@ -70,15 +69,13 @@ while cap.isOpened():
                 dist = np.linalg.norm([center_x - pred_x, center_y - pred_y])
 
                 # distance threshold in pixel
-                if dist < 70 and dist < min_dist:
+                if dist < 70:
                     assigned_id = track_id
                     min_dist = dist
 
             # Start a new track if no track is assigned
             if assigned_id is None:
-                assigned_id = track_id
-                track_id += 1
-
+                assigned_id = len(tracks)
 
             tracks[assigned_id] = (center_x, center_y)
             kf.update(assigned_id, (center_x, center_y))
