@@ -4,7 +4,7 @@ import os
 import cv2
 import numpy as np
 import pandas as pd
-import plotly.express as px
+from scipy.spatial.distance import mahalanobis
 from ultralytics import YOLO
 
 import Config
@@ -46,12 +46,12 @@ def get_poses(position_path, orientation_path):
 model = YOLO("../res/last.pt")
 tracks = {}
 
-image_folder = "../res/images/db_file_8/left_image_rect_color/"
-depth_folder = "../res/images/db_file_8/depth_registered/"
+image_folder = "../res/images/db_file_6/left_image_rect_color/"
+depth_folder = "../res/images/db_file_6/depth_registered/"
 
-images = sorted(glob.glob(os.path.join(image_folder, "*.png")), key=extract_number)
+images = sorted(glob.glob(os.path.join(image_folder, "*.tiff")), key=extract_number)
 depth_maps = sorted(glob.glob(os.path.join(depth_folder, "*.tiff")), key=extract_number)
-poses = get_poses(Config.IMAGE_DIR / 'db_file_8' / 'pose' / 'pose_position.txt', Config.IMAGE_DIR / 'db_file_8' / 'pose' / 'pose_orientation.txt')
+poses = get_poses(Config.IMAGE_DIR / 'db_file_6' / 'pose' / 'pose_position.txt', Config.IMAGE_DIR / 'db_file_6' / 'pose' / 'pose_orientation.txt')
 
 camera_pos = []
 track_dict = []
@@ -86,28 +86,21 @@ for idx, image_path in enumerate(images):
                 # Loop through all tracks to find a matching track
                 for track_id, tracker in tracks.items():
                     pred_pos = tracker.predict()
-                    #dist = np.linalg.norm(pred_pos - normalized_pylon_position) # Euclidean distance
+                    #dist = np.linalg.norm(pred_pos - normalized_pylon_position)
 
-                    if tracker.history:
-                        window_size = 10
-                        if len(tracker.history) >= window_size:
-                            avg_pos = np.mean(tracker.history[-window_size:], axis=0)
-                        else:
-                            avg_pos = np.mean(tracker.history, axis=0)
-                    else:
-                        avg_pos = tracker.predict()
-
-                    dist = np.linalg.norm(avg_pos - normalized_pylon_position)
+                    try:
+                        inv_cov = np.linalg.inv(tracker.kf.P[:3, :3])
+                        dist = mahalanobis(normalized_pylon_position, pred_pos, inv_cov)
+                    except np.linalg.LinAlgError:
+                        dist = float("inf")
 
                     # Distance threshold
-                    if dist < 1.0 and dist < min_dist and tracker.pred_class == class_num:
+                    if dist < 2.5 and dist < min_dist and tracker.pred_class == class_num:
                         min_dist = dist
                         assigned_id = track_id
 
-                track_dict.append({'id': assigned_id,
-                                   'x': normalized_pylon_position[0],
-                                   'y': normalized_pylon_position[1],
-                                   'z': normalized_pylon_position[2]})
+
+                track_dict.append({'id': assigned_id, 'x': normalized_pylon_position[0], 'y': normalized_pylon_position[1], 'z': normalized_pylon_position[2]})
 
                 # create a new track if no suitable track was found
                 if assigned_id is None:
@@ -127,6 +120,11 @@ for idx, image_path in enumerate(images):
 
 cv2.destroyAllWindows()
 
+import numpy as np
+import matplotlib.pyplot as plt
+
+import plotly.express as px
+
 camera_pos = np.array(camera_pos)
 df = pd.DataFrame({'x': camera_pos[:, 1], 'y': camera_pos[:, 0], 'z': camera_pos[:, 2], 'id': 'camera'})
 tr = pd.DataFrame(track_dict)
@@ -136,3 +134,4 @@ max = round(concat[['x', 'y', 'z']].max().max())
 
 fig = px.scatter_3d(concat, x='x', y='y', z='z', color='id', range_x=[max, min], range_y=[max, min], range_z=[max, min])
 fig.show()
+

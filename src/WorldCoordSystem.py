@@ -40,7 +40,11 @@ def pixel_to_world(center_x, center_y, depth, px, py, pz, qx, qy, qz, qw, K):
     Y_coord = p_norm[1] * depth
     Z_coord = np.sqrt(depth**2 - (X_coord**2 + Y_coord**2))  # depth != Z -> Pythagoras
 
-    pylon_position = np.array([X_coord, Y_coord, Z_coord])
+    pylon_position = np.array([
+        Z_coord,  # ROS: x = forward (entspricht Optical-Z)
+        -X_coord,  # ROS: y = left (entspricht - Optical-X)
+        -Y_coord  # ROS: z = up (entspricht - Optical-Y)
+    ])
 
     # create rotation matrix from quaternion
     R = quaternion_to_rotation_matrix(qx, qy, qz, qw)
@@ -49,7 +53,7 @@ def pixel_to_world(center_x, center_y, depth, px, py, pz, qx, qy, qz, qw, K):
     camera_position = np.array([px, py, pz])
     normalized_pylon_position = R @ pylon_position + camera_position
 
-    return normalized_pylon_position
+    return normalized_pylon_position[1], normalized_pylon_position[0], normalized_pylon_position[2]
 
 def get_3d_position(bbox, depth_map, K, px, py, pz, qx, qy, qz, qw):
     """
