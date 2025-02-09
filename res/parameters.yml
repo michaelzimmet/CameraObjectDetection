@@ -1,13 +1,13 @@
 database_files:
-  db_file_1: /run/media/zimc/Toshiba/ros_bags/20241202_142055/camera_20241202_142055_bag/camera_20241202_142055_bag_0.db3
-  db_file_2: /run/media/zimc/Toshiba/ros_bags/20241202_141844/camera_20241202_141844_bag/camera_20241202_141844_bag_0.db3
-  db_file_3: /run/media/zimc/Toshiba/ros_bags/20241202_141623/camera_20241202_141623_bag/camera_20241202_141623_bag_0.db3
-  db_file_4: /run/media/zimc/Toshiba/ros_bags/20241202_141336/camera_20241202_141336_bag/camera_20241202_141336_bag_0.db3
-  db_file_5: /run/media/zimc/Toshiba/ros_bags/20241202_140912/camera_20241202_140912_bag/camera_20241202_140912_bag_0.db3
-  db_file_6: /run/media/zimc/Toshiba/ros_bags/20241202_140752/camera_20241202_140752_bag/camera_20241202_140752_bag_0.db3
-  db_file_7: /run/media/zimc/Toshiba/ros_bags/20241202_140532/camera_20241202_140532_bag/camera_20241202_140532_bag_0.db3
-  db_file_8: /run/media/zimc/Toshiba/ros_bags/20241202_140322/camera_20241202_140322_bag/camera_20241202_140322_bag_0.db3
-  db_file_9: /run/media/zimc/Toshiba/ros_bags/20241202_135349/camera_20241202_135349_bag/camera_20241202_135349_bag_0.db3
+  db_file_1: /run/media/user/Toshiba/ros_bags/20241202_142055/camera_20241202_142055_bag/camera_20241202_142055_bag_0.db3
+  db_file_2: /run/media/user/Toshiba/ros_bags/20241202_141844/camera_20241202_141844_bag/camera_20241202_141844_bag_0.db3
+  db_file_3: /run/media/user/Toshiba/ros_bags/20241202_141623/camera_20241202_141623_bag/camera_20241202_141623_bag_0.db3
+  db_file_4: /run/media/user/Toshiba/ros_bags/20241202_141336/camera_20241202_141336_bag/camera_20241202_141336_bag_0.db3
+  db_file_5: /run/media/user/Toshiba/ros_bags/20241202_140912/camera_20241202_140912_bag/camera_20241202_140912_bag_0.db3
+  db_file_6: /run/media/user/Toshiba/ros_bags/20241202_140752/camera_20241202_140752_bag/camera_20241202_140752_bag_0.db3
+  db_file_7: /run/media/user/Toshiba/ros_bags/20241202_140532/camera_20241202_140532_bag/camera_20241202_140532_bag_0.db3
+  db_file_8: /run/media/user/Toshiba/ros_bags/20241202_140322/camera_20241202_140322_bag/camera_20241202_140322_bag_0.db3
+  db_file_9: /run/media/user/Toshiba/ros_bags/20241202_135349/camera_20241202_135349_bag/camera_20241202_135349_bag_0.db3
 
 topics:
   image_rect_color: /zed/zed_node/rgb/image_rect_color
